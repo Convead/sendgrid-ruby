@@ -5,7 +5,7 @@ require 'mimemagic'
 module SendGrid
   class Mail
     attr_accessor :to, :to_name, :from, :from_name, :subject, :text, :html, :cc, :cc_name,
-                  :bcc, :bcc_name, :reply_to, :date, :smtpapi, :attachments, :content, :template
+                  :bcc, :bcc_name, :reply_to, :date, :smtpapi, :attachments, :content, :template, :headers
 
     def initialize(params = {})
       params.each do |k, v|
@@ -174,6 +174,8 @@ module SendGrid
           payload[:content].delete(":default")
         end
       end
+
+      payload[:headers] = headers.to_json if headers.any?
 
       payload
     end
