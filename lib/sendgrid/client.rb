@@ -3,12 +3,13 @@ require 'faraday'
 module SendGrid
   class Client
     attr_accessor :api_user, :api_key, :protocol, :host, :port, :url, :endpoint,
-                  :user_agent, :template
+                  :user_agent, :template, :on_behalf_of
     attr_writer :adapter, :conn, :raise_exceptions
 
     def initialize(params = {})
       self.api_user         = params.fetch(:api_user, nil)
       self.api_key          = params.fetch(:api_key, nil)
+      self.on_behalf_of     = params.fetch(:on_behalf_of, nil)
       self.protocol         = params.fetch(:protocol, 'https')
       self.host             = params.fetch(:host, 'api.sendgrid.com')
       self.port             = params.fetch(:port, nil)
@@ -33,6 +34,11 @@ module SendGrid
         else
           # API key
           req.headers['Authorization'] = "Bearer #{api_key}"
+        end
+
+        # Act on behalf of a given subuser
+        if on_behalf_of
+          req.headers['On-Behalf-Of'] = on_behalf_of
         end
 
         req.body = payload
